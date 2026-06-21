@@ -65,7 +65,7 @@ export default function ScannerPage() {
         
         const data = (await res.json()) as ScanResult;
         if (data.success) {
-          setResult(data.analysis);
+          setResult(data.analysis || null);
         } else {
           console.error(data.error);
         }

@@ -12,8 +12,8 @@ A smart, full-stack web application that helps users understand and reduce their
 - [API Endpoints](#api-endpoints)
 - [User Journey](#user-journey)
 - [Contributing](#contributing)
-- [License](#license)
 - [Troubleshooting](#troubleshooting)
+- [Support](#support)
 
 ## 🎯 Overview
 
@@ -124,15 +124,14 @@ greenmind-ai/
 ### Prerequisites
 - Node.js 18+ and npm/yarn
 - MongoDB Atlas account
-- Google OAuth credentials
+- Firebase project (with Google Authentication enabled)
 - Gemini API key from Google AI Studio
-- Firebase project
 
 ### Installation
 
 1. **Clone & Install**
    ```bash
-   git clone <repo-url>
+   git clone https://github.com/Nishitha-B-Rao/greenmind-ai.git
    cd greenmind-ai
    npm install
    ```
@@ -187,8 +186,8 @@ GEMINI_API_KEY=AIzaXXXXXXXXXXX
 4. Download Admin SDK service account JSON from Settings → Service Accounts for server-side config
 
 **Gemini API Key:**
-1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Create new API key (free tier available)
+1. Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
+2. Create a new API key (free tier available)
 
 
 
@@ -305,9 +304,9 @@ kill -9 <PID>
 
 ### Gemini API Errors
 - Verify API key is valid and has quota
-- Check [Google Cloud Console](https://console.cloud.google.com/) for rate limits
+- Check [Google AI Studio](https://aistudio.google.com/) for rate limits
 - Ensure `gemini-2.5-flash` model is available in your region
-- Check API is enabled in Google Cloud project
+- Check API is enabled in your Google project
 
 ### Chat Widget Not Appearing
 - Check browser console for errors
