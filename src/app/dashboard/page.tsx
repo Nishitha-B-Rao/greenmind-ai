@@ -18,8 +18,8 @@ type Assessment = {
 type Challenge = {
   _id: string;
   status?: string;
-  title?: string;
-  description?: string;
+  title: string;
+  description: string;
 };
 
 type DashboardData = {
