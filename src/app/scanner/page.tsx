@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/components/AuthContext";
 import { Navigation } from "@/components/Navigation";
 import { ChatWidget } from "@/components/ChatWidget";
@@ -15,6 +15,11 @@ type AnalysisResult = {
   ecoAlternative: string;
 };
 
+type HistoryItem = AnalysisResult & {
+  _id: string;
+  createdAt: string;
+};
+
 type ScanResult = {
   success?: boolean;
   analysis?: AnalysisResult;
@@ -26,6 +31,30 @@ export default function ScannerPage() {
   const [preview, setPreview] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+
+  const { user } = useAuth();
+
+  useEffect(() => {
+    async function fetchHistory() {
+      if (!user) return;
+      try {
+        const token = await user.getIdToken();
+        const res = await fetch("/api/receipt", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.history) {
+            setHistory(data.history);
+          }
+        }
+      } catch (e) {
+        console.error("Failed to fetch history", e);
+      }
+    }
+    fetchHistory();
+  }, [user]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
@@ -37,8 +66,6 @@ export default function ScannerPage() {
       alert("Please select a JPG or PNG image.");
     }
   };
-
-  const { user } = useAuth();
   
   const handleScan = async () => {
     if (!file) return;
@@ -63,9 +90,11 @@ export default function ScannerPage() {
           body: JSON.stringify({ imageBase64, mimeType: file.type })
         });
         
-        const data = (await res.json()) as ScanResult;
-        if (data.success) {
-          setResult(data.analysis || null);
+        const data = (await res.json()) as ScanResult & { analysis?: HistoryItem };
+        if (data.success && data.analysis) {
+          setResult(data.analysis);
+          // Add to history list immediately
+          setHistory(prev => [data.analysis as HistoryItem, ...prev]);
         } else {
           console.error(data.error);
         }
@@ -99,6 +128,15 @@ export default function ScannerPage() {
                 <div 
                   className="w-full h-64 border-2 border-dashed border-emerald-300/50 rounded-xl flex flex-col items-center justify-center bg-white/40 hover:bg-emerald-50/50 transition-all duration-300 cursor-pointer group"
                   onClick={() => document.getElementById("receipt")?.click()}
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Upload receipt image"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      document.getElementById("receipt")?.click();
+                    }
+                  }}
                 >
                   <Upload className="w-10 h-10 text-emerald-400 mb-2 group-hover:text-emerald-500 group-hover:scale-110 transition-transform duration-300" />
                   <p className="text-sm font-medium text-emerald-800/70">Click to upload or drag and drop</p>
@@ -169,6 +207,36 @@ export default function ScannerPage() {
             </Card>
           )}
         </div>
+
+        {/* History Section */}
+        {history.length > 0 && (
+          <div className="mt-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <h2 className="text-2xl font-bold text-green-900 mb-6">Receipt History</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {history.map((item) => (
+                <Card key={item._id} className="glass-card shadow-md border-white/40">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-gray-500">
+                      {new Date(item.createdAt).toLocaleDateString()}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2 text-sm">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium text-gray-700">Impact:</span>
+                      <span className={`font-bold ${item.estimatedFoodImpact === 'High' ? 'text-red-600' : 'text-green-600'}`}>
+                        {item.estimatedFoodImpact}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-700 block">Highest Offender:</span>
+                      <span className="text-red-800">{item.highestOffender}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
       </main>
       <ChatWidget />
     </div>

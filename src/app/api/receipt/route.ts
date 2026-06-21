@@ -59,3 +59,22 @@ Expected JSON:
     return NextResponse.json({ error: "Failed to process receipt" }, { status: 500 });
   }
 }
+
+export async function GET(req: Request) {
+  try {
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const token = authHeader.split("Bearer ")[1];
+    const decodedToken = await adminAuth.verifyIdToken(token);
+
+    await dbConnect();
+    const user = await User.findOne({ email: decodedToken.email });
+    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+    const history = await ReceiptAnalysis.find({ userId: user._id }).sort({ createdAt: -1 }).limit(10);
+    return NextResponse.json({ success: true, history });
+  } catch (error) {
+    console.error("Receipt history error:", error);
+    return NextResponse.json({ error: "Failed to fetch receipt history" }, { status: 500 });
+  }
+}

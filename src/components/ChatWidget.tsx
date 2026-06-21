@@ -54,10 +54,11 @@ export function ChatWidget() {
     return (
       <Button 
         onClick={() => setIsOpen(true)}
+        aria-label="Open Climate Coach"
         className="group fixed bottom-6 right-6 rounded-full h-14 bg-emerald-600 hover:bg-emerald-700 shadow-xl flex items-center justify-center transition-all duration-300 hover:-translate-y-1 overflow-hidden px-4"
       >
         <div className="flex items-center gap-2">
-          <MessageCircle className="w-6 h-6 text-white flex-shrink-0" />
+          <MessageCircle className="w-6 h-6 text-white flex-shrink-0" aria-hidden="true" />
           <span className="font-medium text-white overflow-hidden max-w-0 group-hover:max-w-[200px] transition-all duration-500 ease-in-out whitespace-nowrap">
             Climate Coach
           </span>
@@ -70,11 +71,11 @@ export function ChatWidget() {
     <Card className="fixed bottom-6 right-6 w-80 shadow-2xl border-white/40 bg-white/85 backdrop-blur-xl z-50 flex flex-col h-[500px] animate-in slide-in-from-bottom-10 fade-in duration-500 rounded-2xl overflow-hidden">
       <CardHeader className="bg-gradient-to-r from-emerald-600 to-teal-700 text-white py-4 flex flex-row items-center justify-between border-b border-white/10">
         <CardTitle className="text-md flex items-center gap-2">
-          <MessageCircle className="w-4 h-4" />
+          <MessageCircle className="w-4 h-4" aria-hidden="true" />
           Climate Coach
         </CardTitle>
-        <Button variant="ghost" size="icon" className="text-white hover:bg-green-700 w-8 h-8 rounded-full" onClick={() => setIsOpen(false)}>
-          <X className="w-4 h-4" />
+        <Button variant="ghost" size="icon" aria-label="Close chat" className="text-white hover:bg-green-700 w-8 h-8 rounded-full" onClick={() => setIsOpen(false)}>
+          <X className="w-4 h-4" aria-hidden="true" />
         </Button>
       </CardHeader>
       <CardContent className="flex-1 p-0 overflow-hidden">
@@ -103,10 +104,14 @@ export function ChatWidget() {
             value={input} 
             onChange={e => setInput(e.target.value)}
             placeholder="Ask your climate coach..." 
+            aria-label="Chat input"
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') setIsOpen(false);
+            }}
             className="flex-1 rounded-full border-slate-200 focus-visible:ring-emerald-500 bg-white"
           />
-          <Button type="submit" size="icon" disabled={isLoading || !input.trim()} className="rounded-full bg-emerald-600 hover:bg-emerald-700 shadow-md hover:shadow-lg transition-all">
-            <Send className="w-4 h-4" />
+          <Button type="submit" size="icon" aria-label="Send message" disabled={isLoading || !input.trim()} className="rounded-full bg-emerald-600 hover:bg-emerald-700 shadow-md hover:shadow-lg transition-all">
+            <Send className="w-4 h-4" aria-hidden="true" />
           </Button>
         </form>
       </CardFooter>
