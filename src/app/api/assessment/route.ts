@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     // Zod Validation
     const validation = AssessmentSchema.safeParse(rawBody);
     if (!validation.success) {
-      return NextResponse.json({ error: "Validation failed", details: validation.error.errors }, { status: 400 });
+      return NextResponse.json({ error: "Validation failed", details: validation.error.format() }, { status: 400 });
     }
     const body = validation.data;
     
