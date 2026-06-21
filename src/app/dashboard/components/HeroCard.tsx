@@ -3,10 +3,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-export function HeroCard({ score, riskLevel }: { score: number, riskLevel: string }) {
+import { calculateCarbonScore, calculateImprovementPercentage } from "@/utils/scoring";
+
+export function HeroCard({ baseScore, completedCount, riskLevel }: { baseScore: number, completedCount: number, riskLevel: string }) {
+  const currentScore = calculateCarbonScore(baseScore, completedCount);
+  const improvement = calculateImprovementPercentage(baseScore, currentScore);
+
   const radius = 60;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (score / 100) * circumference;
+  const strokeDashoffset = circumference - (currentScore / 100) * circumference;
 
   return (
     <Card className="bg-gradient-to-br from-emerald-500 to-teal-700 text-white border-none shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 relative overflow-hidden group">
@@ -15,9 +20,16 @@ export function HeroCard({ score, riskLevel }: { score: number, riskLevel: strin
       <CardHeader className="relative z-10">
         <div className="flex justify-between items-center">
           <CardTitle className="text-xl">Your Carbon Score</CardTitle>
-          <Badge variant="secondary" className="bg-white/20 text-white hover:bg-white/30 border-none">
-            {riskLevel} Risk
-          </Badge>
+          <div className="flex gap-2">
+            {improvement > 0 && (
+              <Badge variant="secondary" className="bg-green-400 text-green-950 border-none font-bold">
+                ↓ {improvement}%
+              </Badge>
+            )}
+            <Badge variant="secondary" className="bg-white/20 text-white hover:bg-white/30 border-none">
+              {riskLevel} Risk
+            </Badge>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="flex justify-center py-6">
@@ -45,7 +57,7 @@ export function HeroCard({ score, riskLevel }: { score: number, riskLevel: strin
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-4xl font-bold">{score}</span>
+            <span className="text-4xl font-bold">{currentScore}</span>
             <span className="text-sm opacity-80">/ 100</span>
           </div>
         </div>

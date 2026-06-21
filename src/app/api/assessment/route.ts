@@ -5,6 +5,8 @@ import dbConnect from '@/lib/mongodb';
 import Assessment from '@/models/Assessment';
 import User from '@/models/User';
 
+import { AssessmentSchema } from '@/lib/validations';
+
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function POST(req: Request) {
@@ -18,7 +20,14 @@ export async function POST(req: Request) {
     const user = await User.findOne({ email: decodedToken.email });
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-    const body = await req.json();
+    const rawBody = await req.json();
+    
+    // Zod Validation
+    const validation = AssessmentSchema.safeParse(rawBody);
+    if (!validation.success) {
+      return NextResponse.json({ error: "Validation failed", details: validation.error.errors }, { status: 400 });
+    }
+    const body = validation.data;
     
     const prompt = `You are an expert environmental analyst. Analyze the user's lifestyle profile and estimate a directional carbon score from 1 to 100 (where 100 is excellent/lowest emissions and 1 is terrible/highest emissions). Identify the largest contributor to emissions. Provide practical, realistic recommendations. Return only valid JSON.
     

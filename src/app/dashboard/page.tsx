@@ -6,7 +6,9 @@ import { HeroCard } from "./components/HeroCard";
 import { InsightCard } from "./components/InsightCard";
 import { ChallengeCard } from "./components/ChallengeCard";
 import { ProgressWidget } from "./components/ProgressWidget";
+import { ProgressChart } from "./components/ProgressChart";
 import { Loader2 } from "lucide-react";
+import { calculateCarbonScore } from "@/utils/scoring";
 
 type Assessment = {
   carbonScore?: number;
@@ -64,11 +66,18 @@ export default function DashboardPage() {
   const { assessment, challenges } = data;
   const completedChallenges = challenges?.filter((challenge) => challenge.status === "completed").length || 0;
   const activeChallenge = challenges?.find((challenge) => challenge.status === "accepted") || null;
+  
+  const currentScore = calculateCarbonScore(assessment?.carbonScore || 0, completedChallenges);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       <div className="md:col-span-2 space-y-6">
-        <HeroCard score={assessment?.carbonScore || 0} riskLevel={assessment?.riskLevel || "Unknown"} />
+        <HeroCard 
+          baseScore={assessment?.carbonScore || 0} 
+          completedCount={completedChallenges} 
+          riskLevel={assessment?.riskLevel || "Unknown"} 
+        />
+        <ProgressChart baseScore={assessment?.carbonScore || 0} currentScore={currentScore} />
         <InsightCard 
           topSource={assessment?.topEmissionSource || "Unknown"} 
           recommendations={assessment?.recommendations || []} 
