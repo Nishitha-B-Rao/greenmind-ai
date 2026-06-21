@@ -334,7 +334,7 @@ npm update --save-dev @types/node @types/react
 ## 📞 Support
 
 For issues or questions:
-1. Check existing [GitHub Issues](../../issues)
+1. Check existing [GitHub Issues](https://github.com/Nishitha-B-Rao/greenmind-ai/issues)
 2. Review code comments and inline docs
 3. Check browser console for client-side errors
 4. Check server logs for API errors

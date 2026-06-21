@@ -27,7 +27,11 @@ export default function LoginPage() {
     try {
       await signInWithPopup(auth, googleProvider);
       // AuthContext will handle the redirect via useEffect
-    } catch (error) {
+    } catch (error: any) {
+      if (error.code === 'auth/cancelled-popup-request' || error.code === 'auth/popup-closed-by-user') {
+        // Expected behavior if user closes the window or clicks multiple times quickly
+        return;
+      }
       console.error("Login failed", error);
     }
   };

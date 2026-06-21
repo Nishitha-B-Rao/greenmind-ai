@@ -8,9 +8,16 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Upload, Loader2, Leaf, AlertTriangle } from "lucide-react";
 
+type AnalysisResult = {
+  estimatedFoodImpact: string;
+  highestOffender: string;
+  reason: string;
+  ecoAlternative: string;
+};
+
 type ScanResult = {
   success?: boolean;
-  analysis?: unknown;
+  analysis?: AnalysisResult;
   error?: string;
 };
 
@@ -18,7 +25,7 @@ export default function ScannerPage() {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState(false);
-  const [result, setResult] = useState<unknown>(null);
+  const [result, setResult] = useState<AnalysisResult | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
